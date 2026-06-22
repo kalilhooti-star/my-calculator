@@ -7,7 +7,15 @@
         .calculator { background: #ffffff; padding: 25px; border-radius: 40px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
         .display { text-align: right; padding: 20px; height: 140px; display: flex; flex-direction: column; justify-content: flex-end; }
-        #main-expr { font-size: 3rem; font-weight: 800; color: #333; word-wrap: break-word; } /* ضخیم‌تر */
+        #main-expr { 
+    font-size: 3rem; 
+    font-weight: 800; 
+    color: #333; 
+    word-wrap: break-word;
+    direction: ltr;        /* اضافه شد برای نمایش صحیح اعداد */
+    text-align: right;     /* اضافه شد برای چسبیدن به سمت راست */
+}
+         /* ضخیم‌تر */
         #temp-result { font-size: 1.5rem; color: #999; height: 35px; }
 
         .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -26,7 +34,7 @@
 
 <div class="calculator">
     <div class="display">
-        <div id="main-expr">0</div>
+        <div id="main-expr"dir="ltr">0</div>
         <div id="temp-result"></div>
     </div>
    <div class="buttons">
