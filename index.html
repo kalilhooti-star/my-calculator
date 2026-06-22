@@ -4,45 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f7f7f7; font-family: sans-serif; }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f7f7f7; font-family: sans-serif; margin: 0; }
         .calculator { background: #ffffff; padding: 25px; border-radius: 40px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
         .display { text-align: right; padding: 20px; height: 140px; display: flex; flex-direction: column; justify-content: flex-end; }
-        #main-expr { 
-    font-size: 3rem; 
-    font-weight: 800; 
-    color: #333; 
-    word-wrap: break-word;
-    direction: ltr;        /* اضافه شد برای نمایش صحیح اعداد */
-    text-align: right;     /* اضافه شد برای چسبیدن به سمت راست */
-}
-         /* ضخیم‌تر */
+        #main-expr { font-size: 3rem; font-weight: 800; color: #333; word-wrap: break-word; direction: ltr; text-align: right; }
         #temp-result { font-size: 1.5rem; color: #999; height: 35px; }
 
         .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        button { 
-            height: 60px; border: none; border-radius: 20px; font-size: 1.6rem; font-weight: 600;
-            cursor: pointer; background: #fdfdfd; color: #333; transition: 0.2s; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        button { height: 60px; border: none; border-radius: 20px; font-size: 1.6rem; font-weight: 600; cursor: pointer; background: #fdfdfd; color: #333; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         button:active { transform: scale(0.95); background: #eee; }
         
         .operator { color: #ff8c00; font-weight: bold; font-size: 1.8rem; }
         .equals { background: #ff8c00; color: white; grid-row: span 2; }
-        /* تنظیم برای دستگاه‌های کوچک */
-@media (max-width: 400px) {
-    .calculator {
-        width: 90%; /* عرض ماشین‌حساب ۹۰ درصدِ صفحه گوشی باشد */
-        padding: 15px;
-    }
-}
+
+        /* حالت موبایل: تمام‌صفحه */
+        @media (max-width: 400px) {
+            .calculator { width: 100%; height: 100vh; border-radius: 0; padding: 20px; box-shadow: none; }
+        }
     </style>
 </head>
 <body>
 
 <div class="calculator">
     <div class="display">
-        <div id="main-expr"dir="ltr">0</div>
+        <div id="main-expr" dir="ltr">0</div>
         <div id="temp-result"></div>
     </div>
    <div class="buttons">
@@ -77,20 +63,28 @@
     let expression = "";
 
     function addChar(char) {
-        if (['+', '-', '×', '÷'].includes(char)) {
+        const operators = ['+', '-', '×', '÷'];
+        
+        // اگر کاربر عملگر زد و آخرین کاراکتر هم عملگر بود، جایگزین کن
+        if (operators.includes(char)) {
             let last = expression.slice(-1);
-            if (['+', '-', '×', '÷'].includes(last)) return;
+            if (operators.includes(last)) {
+                expression = expression.slice(0, -1) + char;
+                updateDisplay();
+                return;
+            }
         }
+
         if (expression === "0" && char !== ".") expression = char;
         else expression += char;
         updateDisplay();
     }
 
     function updateDisplay() {
-        document.getElementById('main-expr').innerText = expression;
+        document.getElementById('main-expr').innerText = expression || "0";
         try {
             let calc = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100');
-            if (!isNaN(calc.slice(-1))) {
+            if (!isNaN(calc.slice(-1)) && calc !== "") {
                 document.getElementById('temp-result').innerText = "= " + eval(calc);
             } else {
                 document.getElementById('temp-result').innerText = "";
@@ -98,29 +92,22 @@
         } catch { document.getElementById('temp-result').innerText = ""; }
     }
 
-        function calculate() {
+    function calculate() {
         try {
-            // تبدیل نمادهای نمایشی به عملگرهای ریاضی
             let calc = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100');
-            
-            // اصلاح: اگر عبارت به یک عملگر ختم شده، آن را از انتهای رشته حذف کن
-            if (['+', '-', '*', '/'].includes(calc.slice(-1))) {
-                calc = calc.slice(0, -1);
-            }
-            
-            // محاسبه نتیجه
+            if (['+', '-', '*', '/'].includes(calc.slice(-1))) calc = calc.slice(0, -1);
             let res = eval(calc);
             document.getElementById('main-expr').innerText = res;
             document.getElementById('temp-result').innerText = "";
             expression = res.toString();
         } catch { 
-            // در صورت بروز خطا در عبارت، نمایش خطا
             document.getElementById('main-expr').innerText = "خطا"; 
+            expression = "";
         }
     }
 
     function clearAll() { expression = ""; document.getElementById('main-expr').innerText = "0"; document.getElementById('temp-result').innerText = ""; }
-    function backspace() { expression = expression.slice(0, -1); if(expression=="") expression="0"; updateDisplay(); }
+    function backspace() { expression = expression.slice(0, -1); updateDisplay(); }
 </script>
 </body>
 </html>
