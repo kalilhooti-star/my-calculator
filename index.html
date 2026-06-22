@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f7f7f7; font-family: sans-serif; }
+        .calculator { background: #ffffff; padding: 25px; border-radius: 40px; width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        .display { text-align: right; padding: 20px; height: 140px; display: flex; flex-direction: column; justify-content: flex-end; }
+        #main-expr { font-size: 3rem; font-weight: 800; color: #333; word-wrap: break-word; } /* ضخیم‌تر */
+        #temp-result { font-size: 1.5rem; color: #999; height: 35px; }
+
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        button { 
+            height: 60px; border: none; border-radius: 20px; font-size: 1.6rem; font-weight: 600;
+            cursor: pointer; background: #fdfdfd; color: #333; transition: 0.2s; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        button:active { transform: scale(0.95); background: #eee; }
+        
+        .operator { color: #ff8c00; font-weight: bold; font-size: 1.8rem; }
+        .equals { background: #ff8c00; color: white; grid-row: span 2; }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <div class="display">
+        <div id="main-expr">0</div>
+        <div id="temp-result"></div>
+    </div>
+   <div class="buttons">
+    <button class="operator" onclick="addChar('÷')">÷</button>
+    <button onclick="addChar('%')">%</button>
+    <button onclick="backspace()">⌫</button>
+    <button onclick="clearAll()" style="color: #ff8c00;">AC</button>
+
+    <button class="operator" onclick="addChar('×')">×</button>
+    <button onclick="addChar('9')">9</button>
+    <button onclick="addChar('8')">8</button>
+    <button onclick="addChar('7')">7</button>
+
+    <button class="operator" onclick="addChar('-')">-</button>
+    <button onclick="addChar('6')">6</button>
+    <button onclick="addChar('5')">5</button>
+    <button onclick="addChar('4')">4</button>
+
+    <button class="operator" onclick="addChar('+')">+</button>
+    <button onclick="addChar('3')">3</button>
+    <button onclick="addChar('2')">2</button>
+    <button onclick="addChar('1')">1</button>
+
+    <button class="equals" onclick="calculate()">=</button>
+    <button onclick="addChar('.')">.</button>
+    <button onclick="addChar('0')">0</button>
+    <div></div>
+</div>
+</div>
+
+<script>
+    let expression = "";
+
+    function addChar(char) {
+        if (['+', '-', '×', '÷'].includes(char)) {
+            let last = expression.slice(-1);
+            if (['+', '-', '×', '÷'].includes(last)) return;
+        }
+        if (expression === "0" && char !== ".") expression = char;
+        else expression += char;
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        document.getElementById('main-expr').innerText = expression;
+        try {
+            let calc = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100');
+            if (!isNaN(calc.slice(-1))) {
+                document.getElementById('temp-result').innerText = "= " + eval(calc);
+            } else {
+                document.getElementById('temp-result').innerText = "";
+            }
+        } catch { document.getElementById('temp-result').innerText = ""; }
+    }
+
+        function calculate() {
+        try {
+            // تبدیل نمادهای نمایشی به عملگرهای ریاضی
+            let calc = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/%/g, '/100');
+            
+            // اصلاح: اگر عبارت به یک عملگر ختم شده، آن را از انتهای رشته حذف کن
+            if (['+', '-', '*', '/'].includes(calc.slice(-1))) {
+                calc = calc.slice(0, -1);
+            }
+            
+            // محاسبه نتیجه
+            let res = eval(calc);
+            document.getElementById('main-expr').innerText = res;
+            document.getElementById('temp-result').innerText = "";
+            expression = res.toString();
+        } catch { 
+            // در صورت بروز خطا در عبارت، نمایش خطا
+            document.getElementById('main-expr').innerText = "خطا"; 
+        }
+    }
+
+    function clearAll() { expression = ""; document.getElementById('main-expr').innerText = "0"; document.getElementById('temp-result').innerText = ""; }
+    function backspace() { expression = expression.slice(0, -1); if(expression=="") expression="0"; updateDisplay(); }
+</script>
+</body>
+</html>
